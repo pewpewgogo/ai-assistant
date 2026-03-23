@@ -117,7 +117,7 @@ class Transcriber:
                 result = self.client.audio.transcriptions.create(
                     model="whisper-1",
                     file=f,
-                    language="en",
+                    language="ru",
                 )
             text = result.text.strip()
             logger.info("Transcription: %s", text)
