@@ -1,0 +1,39 @@
+[build-system]
+requires = ["setuptools>=68.0", "wheel"]
+build-backend = "setuptools.backends._legacy:_Backend"
+
+[project]
+name = "ai-assistant"
+version = "0.1.0"
+description = "Voice-controlled Windows desktop assistant that reads the screen and performs actions"
+requires-python = ">=3.10"
+dependencies = [
+    "PyQt6>=6.6",
+    "openai>=1.0",
+    "anthropic>=0.40",
+    "sounddevice>=0.4",
+    "numpy>=1.24",
+    "mss>=9.0",
+    "pyautogui>=0.9",
+    "pyttsx3>=2.90",
+    "Pillow>=10.0",
+    "pydantic>=2.0",
+    "pydantic-settings>=2.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pyinstaller>=6.0",
+    "pytest>=8.0",
+    "ruff>=0.4",
+]
+
+[project.scripts]
+ai-assistant = "assistant.main:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py310"
