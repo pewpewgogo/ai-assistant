@@ -1,0 +1,53 @@
+name: Build Windows Installer
+
+on:
+  push:
+    tags:
+      - "v*"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -e ".[dev]"
+
+      - name: Build executable with PyInstaller
+        run: pyinstaller build.spec
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: AI-Assistant-Windows
+          path: "dist/AI Assistant.exe"
+
+      - name: Create Release
+        if: startsWith(github.ref, 'refs/tags/v')
+        uses: softprops/action-gh-release@v2
+        with:
+          files: "dist/AI Assistant.exe"
+          generate_release_notes: true
+          body: |
+            ## AI Assistant for Windows
+
+            **Download and run — no installation needed.**
+
+            1. Download `AI.Assistant.exe` below
+            2. Double-click to run
+            3. Click the system tray icon → Settings → paste your OpenAI API key
+            4. Click "Hold to Talk" and speak
+
+            Requires an OpenAI API key for voice recognition and AI features.

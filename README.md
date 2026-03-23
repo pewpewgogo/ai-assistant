@@ -2,61 +2,55 @@
 
 Voice-controlled Windows desktop assistant. Speak to it, it sees your screen, and performs actions for you.
 
-## Features
+## Download & Install (Windows)
 
-- **Voice input** — press a button, speak naturally, release
-- **Screen awareness** — captures your screen and understands what's displayed
-- **AI-powered** — uses GPT-4o or Claude to reason about your request
-- **Action execution** — clicks, types, opens apps, presses hotkeys
-- **Spoken responses** — reads answers aloud via text-to-speech
-- **System tray** — runs quietly in the background
+**No programming knowledge needed.**
 
-## Quick Start
+1. Go to the [Releases page](../../releases/latest)
+2. Download **`AI.Assistant.exe`**
+3. Double-click to run it
+4. Right-click the blue **A** icon in your system tray → **Settings**
+5. Paste your OpenAI API key and click **Save**
+6. Click **"Hold to Talk"** and speak
 
-### 1. Install
+That's it. The assistant will listen, see your screen, and help you.
+
+> **Need an OpenAI API key?** Go to [platform.openai.com/api-keys](https://platform.openai.com/api-keys), create an account, and generate a key.
+
+## What It Does
+
+- **Voice input** — press a button, speak naturally
+- **Screen awareness** — sees what's on your screen and understands it
+- **AI-powered** — uses GPT-4o or Claude to figure out what you need
+- **Takes action** — clicks, types, opens apps, presses keyboard shortcuts
+- **Talks back** — reads answers aloud
+
+## One-Click Installer
+
+For an even simpler install, download `install.bat` and double-click it. It will:
+- Download the latest version
+- Create a Desktop shortcut
+- Add it to your Start Menu
+
+---
+
+## For Developers
+
+### Run from source
 
 ```bash
 pip install -e ".[dev]"
-```
-
-### 2. Configure
-
-Run the app and open **Settings** from the system tray:
-
-- Add your **OpenAI API key** (required for voice transcription via Whisper)
-- Optionally add an **Anthropic API key** if you prefer Claude for reasoning
-- Choose your AI model
-
-Settings are saved to `~/.ai-assistant/config.json`.
-
-### 3. Run
-
-```bash
 ai-assistant
 ```
 
-Or directly:
-
-```bash
-python src/assistant/main.py
-```
-
-### 4. Use
-
-1. Click **"Hold to Talk"** in the assistant window
-2. Speak your request (e.g., "Open Chrome and go to Google")
-3. The assistant captures your screen, understands your request, and acts
-
-## Build Windows Executable
+### Build the .exe yourself
 
 ```bash
 pip install pyinstaller
 pyinstaller build.spec
 ```
 
-The executable will be in `dist/AI Assistant.exe`.
-
-## Architecture
+### Architecture
 
 ```
 src/
@@ -74,7 +68,7 @@ src/
     tray.py       — PyQt6 system tray app + chat window + settings
 ```
 
-## Requirements
+### Requirements (source only)
 
 - Python 3.10+
 - Windows 10/11 (primary target), also works on macOS/Linux
