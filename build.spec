@@ -11,9 +11,7 @@ a = Analysis(
     [str(Path("src") / "assistant" / "main.py")],
     pathex=[src_path],
     binaries=[],
-    datas=[
-        ("assets", "assets"),
-    ],
+    datas=[],
     hiddenimports=[
         "pyttsx3.drivers",
         "pyttsx3.drivers.sapi5",
