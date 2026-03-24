@@ -5,6 +5,7 @@ import logging
 import subprocess
 import sys
 import time
+from typing import Union
 
 import pyautogui
 
@@ -15,7 +16,7 @@ pyautogui.PAUSE = 0.3
 pyautogui.FAILSAFE = True  # move mouse to corner to abort
 
 
-def execute_actions(response_text: str) -> list[str]:
+def execute_actions(response_text: str) -> list:
     """Parse AI response for action blocks and execute them.
 
     Returns a list of result descriptions for each action executed.
@@ -87,7 +88,7 @@ def _parse_actions(text: str) -> list[dict]:
     return actions
 
 
-def _run_action(action: dict) -> str:
+def _run_action(action: dict) -> Union[str, dict]:
     """Execute a single action dict."""
     act = action.get("action", "")
 
@@ -137,6 +138,19 @@ def _run_action(action: dict) -> str:
         seconds = float(action.get("seconds", 1))
         time.sleep(seconds)
         return f"Waited {seconds}s"
+
+    elif act == "highlight":
+        logger.info("Highlight: type=%s x=%s y=%s label=%s",
+                     action.get("type"), action.get("x"), action.get("y"), action.get("label"))
+        return {
+            "action": "highlight",
+            "type": action.get("type", "point"),
+            "x": action.get("x", 0),
+            "y": action.get("y", 0),
+            "w": action.get("w", 0),
+            "h": action.get("h", 0),
+            "label": action.get("label", ""),
+        }
 
     else:
         return f"Unknown action: {act}"
