@@ -177,11 +177,14 @@ class MainWindow(QMainWindow):
             # Stop recording
             self.engine.voice.stop()
             self._is_recording = False
-            self.listen_btn.setText("\U0001f3a4  \u041d\u0410\u0416\u041c\u0418 \u0427\u0422\u041e\u0411\u042b \u0413\u041e\u0412\u041e\u0420\u0418\u0422\u042c")
+            self.listen_btn.setText("🎤  НАЖМИ ЧТОБЫ ГОВОРИТЬ")
         else:
-            # Start recording
+            # Start recording — immediately show visual feedback
             self._is_recording = True
-            self.listen_btn.setText("\U0001f534  \u0421\u041b\u0423\u0428\u0410\u042e... (\u043d\u0430\u0436\u043c\u0438 \u0447\u0442\u043e\u0431\u044b \u043e\u0441\u0442\u0430\u043d\u043e\u0432\u0438\u0442\u044c)")
+            self.listen_btn.setText("🔴  СЛУШАЮ... (нажми чтобы остановить)")
+            self.status_icon.setText("🟠")
+            self.status_label.setText("Слушаю...")
+            self.status_label.setStyleSheet("font-size: 20px; font-weight: bold; color: #fab387;")
             self.engine.listen_and_respond()
 
     def _on_stop(self):

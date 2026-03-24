@@ -19,7 +19,7 @@ class Settings(BaseSettings):
 
     # Voice settings
     sample_rate: int = Field(default=16000, description="Audio sample rate in Hz")
-    silence_threshold: float = Field(default=0.02, description="RMS threshold for silence detection")
+    silence_threshold: float = Field(default=0.01, description="RMS threshold for silence detection")
     silence_duration: float = Field(default=1.5, description="Seconds of silence before stopping recording")
     max_recording_seconds: int = Field(default=30, description="Maximum recording duration")
 

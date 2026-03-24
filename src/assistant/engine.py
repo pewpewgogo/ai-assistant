@@ -115,22 +115,32 @@ class AssistantEngine:
 
         if not self._ensure_initialized():
             if self._on_response:
-                self._on_response("Please configure an API key in Settings first.")
+                self._on_response("⚠️ Откройте Настройки и введите API ключ (OpenAI или Anthropic).")
+            self._set_state(AssistantState.IDLE)
             return
 
         def _worker():
             try:
                 # 1. Listen
                 self._set_state(AssistantState.LISTENING)
+                logger.info("Recording started...")
                 audio = self.voice.record()
                 if audio is None:
+                    logger.info("No speech detected.")
+                    if self._on_response:
+                        self._on_response("🎤 Не услышал речь. Попробуйте говорить громче или ближе к микрофону.")
                     self._set_state(AssistantState.IDLE)
                     return
+
+                duration = len(audio) / self.settings.sample_rate
+                logger.info("Recorded %.1f seconds. Transcribing...", duration)
 
                 # 2. Transcribe
                 self._set_state(AssistantState.THINKING)
                 text = self._transcriber.transcribe(audio, self.settings.sample_rate)
                 if not text:
+                    if self._on_response:
+                        self._on_response("🎤 Не удалось распознать речь. Попробуйте ещё раз.")
                     self._set_state(AssistantState.IDLE)
                     return
 
@@ -181,10 +191,10 @@ class AssistantEngine:
                 self._set_state(AssistantState.SPEAKING)
                 self.speaker.speak(response)
 
-            except Exception:
+            except Exception as e:
                 logger.exception("Error in assistant loop")
                 if self._on_response:
-                    self._on_response("Sorry, something went wrong. Check the logs.")
+                    self._on_response(f"⚠️ Произошла ошибка: {e}\nПопробуйте ещё раз.")
             finally:
                 self._set_state(AssistantState.IDLE)
 
