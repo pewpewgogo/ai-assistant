@@ -11,7 +11,10 @@ a = Analysis(
     [str(Path("src") / "assistant" / "main.py")],
     pathex=[src_path],
     binaries=[],
-    datas=[],
+    datas=[
+        ('src/knowledge/ttc450_manual.txt', 'knowledge'),
+        ('src/knowledge/candle_guide.txt', 'knowledge'),
+    ],
     hiddenimports=[
         "pyttsx3.drivers",
         "pyttsx3.drivers.sapi5",
@@ -21,6 +24,11 @@ a = Analysis(
         "mss.windows",
         "pyautogui",
         "pyautogui._pyautogui_win",
+        'pynput',
+        'pynput.keyboard',
+        'pynput.keyboard._win32',
+        'pynput._util',
+        'pynput._util.win32',
     ],
     hookspath=[],
     hooksconfig={},
