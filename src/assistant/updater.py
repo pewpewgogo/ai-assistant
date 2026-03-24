@@ -15,7 +15,7 @@ logger = logging.getLogger(__name__)
 
 # IMPORTANT: Update this value when bumping version in pyproject.toml.
 # This must match the version in pyproject.toml for update checking to work.
-APP_VERSION = "0.3.0"
+APP_VERSION = "0.3.1"
 
 GITHUB_API_URL = "https://api.github.com/repos/pewpewgogo/ai-assistant/releases/latest"
 EXE_ASSET_NAME = "AI.Assistant.exe"

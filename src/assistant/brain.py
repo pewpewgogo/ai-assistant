@@ -39,7 +39,7 @@ class OpenAIProvider:
         response = self.client.chat.completions.create(
             model=self.model,
             messages=messages,
-            max_tokens=2048,
+            max_completion_tokens=2048,
         )
 
         reply = response.choices[0].message.content or ""
