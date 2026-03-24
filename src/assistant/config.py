@@ -30,6 +30,20 @@ class Settings(BaseSettings):
     # Screen settings
     screen_monitor: int = Field(default=1, description="Monitor index to capture (1 = primary)")
 
+    # Hotkey
+    hotkey: str = "f1"
+
+    # Overlay
+    overlay_enabled: bool = True
+    overlay_timeout: int = 8
+    overlay_color: str = "#ff6b6b"
+
+    # Mode
+    default_mode: str = "guide"  # "guide" or "do"
+
+    # Knowledge
+    knowledge_dir: str = ""
+
     # System prompt for the AI
     system_prompt: str = Field(
         default=(
