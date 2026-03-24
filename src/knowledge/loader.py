@@ -16,7 +16,12 @@ class KnowledgeLoader:
 
     def _load_directory(self, knowledge_dir: str) -> None:
         """Load all .txt files, split each into sections by ## headings."""
-        for filename in sorted(os.listdir(knowledge_dir)):
+        try:
+            filenames = sorted(os.listdir(knowledge_dir))
+        except FileNotFoundError:
+            logger.warning("Knowledge directory not found: %s", knowledge_dir)
+            return
+        for filename in filenames:
             if not filename.endswith(".txt"):
                 continue
             filepath = os.path.join(knowledge_dir, filename)
@@ -71,7 +76,7 @@ class KnowledgeLoader:
         for _score, section in scored:
             text = f"### {section['title']}\n{section['body']}"
             if total_chars + len(text) > max_chars:
-                break
+                continue
             results.append(text)
             total_chars += len(text)
 
