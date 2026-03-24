@@ -1,7 +1,11 @@
 import sys
 from pathlib import Path
+from unittest.mock import MagicMock
 
 sys.path.insert(0, str(Path(__file__).parent.parent / "src"))
+
+# Mock pyautogui since it may not be installed in dev/CI
+sys.modules.setdefault("pyautogui", MagicMock())
 
 from actions.executor import _parse_actions, _run_action
 
