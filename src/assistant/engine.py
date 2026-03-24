@@ -1,6 +1,7 @@
 """Core assistant engine - orchestrates the listen-think-act loop."""
 
 import logging
+import sys
 import threading
 from enum import Enum
 from pathlib import Path
@@ -56,8 +57,10 @@ class AssistantEngine:
         self._knowledge_loader = None
         knowledge_dir = self.settings.knowledge_dir
         if not knowledge_dir:
-            # Default to bundled knowledge
-            knowledge_dir = str(Path(__file__).parent.parent / "knowledge")
+            if getattr(sys, '_MEIPASS', None):
+                knowledge_dir = str(Path(sys._MEIPASS) / "knowledge")
+            else:
+                knowledge_dir = str(Path(__file__).parent.parent / "knowledge")
         try:
             self._knowledge_loader = KnowledgeLoader(knowledge_dir)
             logger.info("Knowledge base loaded: %d sections", len(self._knowledge_loader.sections))

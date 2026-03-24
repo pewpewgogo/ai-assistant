@@ -37,6 +37,8 @@ class SignalBridge(QObject):
     state_changed = pyqtSignal(object)
     transcript_received = pyqtSignal(str)
     response_received = pyqtSignal(str)
+    highlight_received = pyqtSignal(str, int, int, int, int, str)
+    hotkey_pressed = pyqtSignal()
 
 
 class MainWindow(QMainWindow):
@@ -341,15 +343,21 @@ def run_app():
         color=settings.overlay_color,
     )
 
-    # Wire overlay to engine
+    # Wire overlay via signal (thread-safe)
+    window.signals.highlight_received.connect(
+        lambda h_type, x, y, w, h, label: overlay.show_highlight(h_type, x, y, w, h, label)
+    )
+
     def on_highlight(h_type, x, y, w, h, label):
-        overlay.show_highlight(h_type, x, y, w, h, label)
+        window.signals.highlight_received.emit(h_type, x, y, w, h, label)
 
     engine.set_overlay_callback(on_highlight)
 
-    # Create global hotkey
+    # Wire hotkey via signal (thread-safe)
+    window.signals.hotkey_pressed.connect(window._on_listen_clicked)
+
     def on_hotkey():
-        window._on_listen_clicked()
+        window.signals.hotkey_pressed.emit()
 
     hotkey = GlobalHotkey(key_name=settings.hotkey, callback=on_hotkey)
     hotkey.start()
