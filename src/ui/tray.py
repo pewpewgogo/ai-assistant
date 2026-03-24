@@ -75,6 +75,38 @@ class MainWindow(QMainWindow):
         layout.setContentsMargins(20, 20, 20, 20)
         layout.setSpacing(16)
 
+        # Update banner — hidden by default
+        self.update_banner = QWidget()
+        self.update_banner.setVisible(False)
+        banner_layout = QHBoxLayout(self.update_banner)
+        banner_layout.setContentsMargins(12, 8, 12, 8)
+
+        self.update_label = QLabel("")
+        self.update_label.setStyleSheet("color: #1e1e2e; font-size: 14px; font-weight: bold;")
+        banner_layout.addWidget(self.update_label, stretch=1)
+
+        self.update_btn = QPushButton("Обновить")
+        self.update_btn.setCursor(Qt.CursorShape.PointingHandCursor)
+        self.update_btn.setStyleSheet(
+            "QPushButton {"
+            "  background-color: #1e1e2e;"
+            "  color: #f9e2af;"
+            "  border: none;"
+            "  border-radius: 8px;"
+            "  padding: 6px 16px;"
+            "  font-size: 13px;"
+            "  font-weight: bold;"
+            "}"
+            "QPushButton:hover { background-color: #313244; }"
+        )
+        self.update_btn.clicked.connect(self._start_update)
+        banner_layout.addWidget(self.update_btn)
+
+        self.update_banner.setStyleSheet(
+            "background-color: #f9e2af; border-radius: 10px;"
+        )
+        layout.addWidget(self.update_banner)
+
         # Status indicator — big, centered
         status_layout = QVBoxLayout()
         status_layout.setAlignment(Qt.AlignmentFlag.AlignCenter)
@@ -222,12 +254,59 @@ class MainWindow(QMainWindow):
         )
 
     def _on_response(self, text: str):
+        # Handle special update messages
+        if text.startswith("__UPDATE_AVAILABLE__"):
+            payload = text.replace("__UPDATE_AVAILABLE__", "")
+            version, url = payload.split("||", 1)
+            self.show_update_available(version, url)
+            return
+        if text.startswith("__UPDATE_PROGRESS__"):
+            pct = text.replace("__UPDATE_PROGRESS__", "")
+            self.update_label.setText(f"Скачивание обновления... {pct}%")
+            return
+        if text == "__UPDATE_FAILED__":
+            self.update_label.setText("Ошибка загрузки обновления")
+            self.update_btn.setText("Повторить")
+            self.update_btn.setEnabled(True)
+            return
+
         import html
         clean = html.escape(text)
         self.chat_log.append(
             f'<p style="color:#a6e3a1; font-size:16px; margin:8px 0;">'
             f'\U0001f916 {clean}</p>'
         )
+
+    def show_update_available(self, version: str, download_url: str):
+        """Show the update banner with version info."""
+        self._update_url = download_url
+        self.update_label.setText(f"Доступно обновление {version}!")
+        self.update_btn.setText("Обновить")
+        self.update_btn.setEnabled(True)
+        self.update_banner.setVisible(True)
+
+    def _start_update(self):
+        """Download and apply the update."""
+        from assistant.updater import download_and_apply_update
+
+        self.update_btn.setEnabled(False)
+        self.update_label.setText("Скачивание обновления...")
+        self.update_btn.setText("\u23f3")
+
+        def do_update():
+            def on_progress(downloaded, total):
+                pct = int(downloaded / total * 100) if total else 0
+                # Update label from worker thread via signal
+                self.signals.response_received.emit(f"__UPDATE_PROGRESS__{pct}")
+
+            success = download_and_apply_update(self._update_url, progress_callback=on_progress)
+            if success:
+                QApplication.quit()
+            else:
+                self.signals.response_received.emit("__UPDATE_FAILED__")
+
+        import threading
+        threading.Thread(target=do_update, daemon=True).start()
 
     def closeEvent(self, event):
         event.ignore()
@@ -339,6 +418,19 @@ def run_app():
     settings = Settings.load()
     engine = AssistantEngine(settings)
     window = MainWindow(engine, settings)
+
+    # Check for updates (non-blocking, runs in background)
+    def check_updates():
+        from assistant.updater import check_for_update
+        result = check_for_update()
+        if result:
+            # Use signal to safely call UI from background thread
+            window.signals.response_received.emit(
+                f"__UPDATE_AVAILABLE__{result['version']}||{result['download_url']}"
+            )
+
+    import threading
+    threading.Thread(target=check_updates, daemon=True).start()
 
     # Create overlay
     overlay = OverlayWindow(
