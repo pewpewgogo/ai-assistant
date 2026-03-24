@@ -41,13 +41,21 @@ jobs:
           files: "dist/AI Assistant.exe"
           generate_release_notes: true
           body: |
-            ## AI Assistant for Windows
+            ## ЧПУ Помощник / CNC Assistant v0.2.0
 
-            **Download and run — no installation needed.**
+            **Голосовой помощник для работы с ЧПУ-фрезером Two Trees TTC450 Pro**
 
-            1. Download `AI.Assistant.exe` below
-            2. Double-click to run
-            3. Click the system tray icon → Settings → paste your OpenAI API key
-            4. Click "Hold to Talk" and speak
+            ### Что нового в v0.2.0
+            - 🎤 Большая кнопка «Говорить» — простой интерфейс для удобной работы
+            - 🎯 Подсветка на экране — помощник показывает стрелками куда нажимать
+            - 📖 База знаний TTC450 Pro и Candle — отвечает на вопросы о станке
+            - ⌨️ Горячая клавиша F1 — начать разговор из любого приложения
+            - 🤖 Режимы «Подсказка» и «Выполнение» — показывает или делает за вас
 
-            Requires an OpenAI API key for voice recognition and AI features.
+            ### Установка
+            1. Скачайте `AI.Assistant.exe` ниже
+            2. Запустите двойным кликом
+            3. Откройте Настройки → вставьте API ключ OpenAI или Anthropic
+            4. Нажмите большую кнопку 🎤 или клавишу F1 и говорите
+
+            Requires an OpenAI or Anthropic API key.
