@@ -26,6 +26,8 @@ from PyQt6.QtWidgets import (
 
 from assistant.config import Settings
 from assistant.engine import AssistantEngine, AssistantState
+from ui.overlay import OverlayWindow
+from assistant.hotkey import GlobalHotkey
 
 logger = logging.getLogger(__name__)
 
@@ -333,6 +335,25 @@ def run_app():
     engine = AssistantEngine(settings)
     window = MainWindow(engine, settings)
 
+    # Create overlay
+    overlay = OverlayWindow(
+        timeout=settings.overlay_timeout,
+        color=settings.overlay_color,
+    )
+
+    # Wire overlay to engine
+    def on_highlight(h_type, x, y, w, h, label):
+        overlay.show_highlight(h_type, x, y, w, h, label)
+
+    engine.set_overlay_callback(on_highlight)
+
+    # Create global hotkey
+    def on_hotkey():
+        window._on_listen_clicked()
+
+    hotkey = GlobalHotkey(key_name=settings.hotkey, callback=on_hotkey)
+    hotkey.start()
+
     # System tray
     icon = _create_icon()
     tray = QSystemTrayIcon(icon, app)
@@ -360,6 +381,12 @@ def run_app():
         else None
     )
     tray.show()
+
+    def cleanup():
+        hotkey.stop()
+        overlay.clear()
+
+    app.aboutToQuit.connect(cleanup)
 
     window.show()
     sys.exit(app.exec())
