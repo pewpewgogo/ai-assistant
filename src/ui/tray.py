@@ -2,6 +2,7 @@
 
 import logging
 import sys
+from pathlib import Path
 
 from PyQt6.QtCore import Qt, pyqtSignal, QObject
 from PyQt6.QtGui import QAction, QIcon, QPixmap, QPainter, QColor, QFont
@@ -378,9 +379,31 @@ class SettingsDialog(QDialog):
         self.tts_rate.setValue(settings.tts_rate)
         layout.addRow("\u0421\u043a\u043e\u0440\u043e\u0441\u0442\u044c \u0440\u0435\u0447\u0438:", self.tts_rate)
 
-        save_btn = QPushButton("\u0421\u043e\u0445\u0440\u0430\u043d\u0438\u0442\u044c")
+        save_btn = QPushButton("Сохранить")
         save_btn.clicked.connect(self._save)
         layout.addRow(save_btn)
+
+        # Show log button for diagnostics
+        log_btn = QPushButton("Показать лог")
+        log_btn.setStyleSheet(
+            "QPushButton { background: #585b70; } QPushButton:hover { background: #6c7086; }"
+        )
+        log_btn.clicked.connect(self._show_log)
+        layout.addRow(log_btn)
+
+    def _show_log(self):
+        """Open the log file so the user can see what's happening."""
+        import subprocess
+        import platform
+        log_file = Path.home() / ".ai-assistant" / "assistant.log"
+        if log_file.exists():
+            if platform.system() == "Windows":
+                subprocess.Popen(["notepad.exe", str(log_file)])
+            else:
+                subprocess.Popen(["open", str(log_file)])
+        else:
+            from PyQt6.QtWidgets import QMessageBox
+            QMessageBox.information(self, "Лог", "Файл лога ещё не создан. Попробуйте сначала нажать кнопку 'Говорить'.")
 
     def _save(self):
         self.settings.ai_provider = self.provider_combo.currentText()

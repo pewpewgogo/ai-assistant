@@ -88,8 +88,14 @@ class AssistantEngine:
             logger.error("No API key configured. Open settings to add one.")
             return False
 
-        if self._transcriber is None and self.settings.openai_api_key:
-            self._transcriber = Transcriber(api_key=self.settings.openai_api_key)
+        # Transcriber uses Whisper (OpenAI). It needs SOME OpenAI key.
+        # If user only has Anthropic key, we can't transcribe.
+        if self._transcriber is None:
+            if self.settings.openai_api_key:
+                self._transcriber = Transcriber(api_key=self.settings.openai_api_key)
+            else:
+                logger.error("Whisper transcription requires an OpenAI API key.")
+                return False
 
         if self._ai is None:
             if self.settings.ai_provider == "anthropic" and self.settings.anthropic_api_key:
@@ -115,7 +121,10 @@ class AssistantEngine:
 
         if not self._ensure_initialized():
             if self._on_response:
-                self._on_response("⚠️ Откройте Настройки и введите API ключ (OpenAI или Anthropic).")
+                self._on_response(
+                    "⚠️ Откройте Настройки и введите API ключ OpenAI.\n"
+                    "Ключ OpenAI нужен для распознавания голоса (Whisper)."
+                )
             self._set_state(AssistantState.IDLE)
             return
 

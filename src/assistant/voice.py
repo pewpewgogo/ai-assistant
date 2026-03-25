@@ -67,6 +67,9 @@ class VoiceCapture:
                         if silence_frames >= silence_frame_limit:
                             logger.info("Silence detected, stopping recording.")
                             break
+        except sd.PortAudioError as e:
+            logger.exception("Microphone error: %s", e)
+            raise RuntimeError(f"Ошибка микрофона: {e}. Проверьте что микрофон подключён.") from e
         except Exception:
             logger.exception("Error during recording")
             return None
